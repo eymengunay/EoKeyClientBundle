@@ -14,13 +14,7 @@ Add EoKeyClientBundle in your composer.json:
 {
     "require": {
         "eo/keyclient-bundle": "dev-master"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/eo/EoKeyClientBundle"
-        }
-    ]
+    }
 }
 ```
 
