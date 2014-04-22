@@ -28,6 +28,6 @@ class EoKeyClientExtension extends Extension
         $loader->load('services.xml');
 
         $container->setParameter('eo_keyclient.alias', $config['alias']);
-        $container->setParameter('eo_keyclient.secret', $config['alias']);
+        $container->setParameter('eo_keyclient.secret', $config['secret']);
     }
 }
