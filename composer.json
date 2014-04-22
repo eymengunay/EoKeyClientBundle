@@ -4,6 +4,7 @@
     "description": "KeyClient provider for JMSPaymentCoreBundle",
     "keywords":    ["keyclient", "cartasi"],
     "homepage":    "https://github.com/eymengunay/EoKeyClientBundle",
+    "license":     "MIT",
     "authors": [
         {
             "name": "Eymen Gunay",
