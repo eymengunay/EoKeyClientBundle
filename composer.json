@@ -1,0 +1,30 @@
+{
+    "name":        "eo/keyclient-bundle",
+    "type":        "symfony-bundle",
+    "description": "KeyClient provider for JMSPaymentCoreBundle",
+    "keywords":    ["keyclient", "cartasi"],
+    "homepage":    "https://github.com/eymengunay/EoKeyClientBundle",
+    "authors": [
+        {
+            "name": "Eymen Gunay",
+            "email": "eymen@egunay.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "symfony/symfony": ">=2.3,<2.6-dev",
+        "jms/payment-core-bundle": "~1.0",
+        "eo/keyclient": "~0.1"
+    },
+    "target-dir": "Eo/KeyClientBundle",
+    "autoload": {
+        "psr-0": {
+            "Eo\\KeyClientBundle": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
