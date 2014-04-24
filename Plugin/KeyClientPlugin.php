@@ -10,10 +10,11 @@ namespace Eo\KeyClientBundle\Plugin;
 
 use Eo\KeyClient\Client;
 use Eo\KeyClient\Payment\PaymentRequest;
-use Eo\KeyClient\Notification\RedirectNotification;
-use JMS\Payment\CoreBundle\Plugin\AbstractPlugin;
 use JMS\Payment\CoreBundle\Model\ExtendedDataInterface;
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
+use JMS\Payment\CoreBundle\Plugin\AbstractPlugin;
+use JMS\Payment\CoreBundle\Plugin\PluginInterface;
+use JMS\Payment\CoreBundle\Plugin\Exception\FinancialException;
 use JMS\Payment\CoreBundle\Plugin\Exception\Action\VisitUrl;
 use JMS\Payment\CoreBundle\Plugin\Exception\ActionRequiredException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -62,20 +63,40 @@ class KeyClientPlugin extends AbstractPlugin
         $alias  = $this->container->getParameter('eo_keyclient.alias');
         $secret = $this->container->getParameter('eo_keyclient.secret');
 
-        $client   = new Client($alias, $secret);
-        $payment  = new PaymentRequest(intval($transaction->getRequestedAmount() * 100), 'EUR', $this->getTransactionCode($data), $this->getCancelUrl($data));
-        $redirect = new RedirectNotification($this->getReturnUrl($data));
-        $payment->addNotification($redirect);
+        $client = new Client($alias, $secret);
+        $paymentRequest = new PaymentRequest(
+            intval($transaction->getRequestedAmount() * 100),  // Amount
+            'EUR',                                             // Currency
+            $this->getTransactionCode($data),                  // Transaction code
+            $this->getReturnUrl($data),                        // Complete url
+            $this->getCancelUrl($data)                         // Cancel url
+        );
 
         // Redirect new transactions to payment page
         if ($transaction->getState() === FinancialTransactionInterface::STATE_NEW) {
-            $redirectUrl   = $client->createPaymentUrl($payment);
+            $redirectUrl   = $client->createPaymentUrl($paymentRequest);
             $actionRequest = new ActionRequiredException('User must authorize the transaction.');
             $actionRequest->setFinancialTransaction($transaction);
             $actionRequest->setAction(new VisitUrl($redirectUrl));
 
             throw $actionRequest;  
         }
+
+        $paymentResponse = $client->parsePaymentResponse();
+
+        if ($paymentResponse->getResult() == 'KO') {
+            $ex = new FinancialException('Key Client error: '.$paymentResponse->getMessage());
+            $ex->setFinancialTransaction($transaction);
+            $transaction->setResponseCode('Failed');
+            $transaction->setReasonCode($paymentResponse->getResult());
+
+            throw $ex;
+        }
+
+        $transaction->setReferenceNumber($paymentResponse->getSignature());
+        $transaction->setProcessedAmount($paymentResponse->getAmount());
+        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
+        $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
     }
 
     /**
