@@ -15,7 +15,7 @@
         "php": ">=5.5.0",
         "symfony/symfony": ">=2.3,<2.6-dev",
         "jms/payment-core-bundle": "~1.0",
-        "eo/keyclient": "~0.1"
+        "eo/keyclient": "<0.2"
     },
     "target-dir": "Eo/KeyClientBundle",
     "autoload": {
