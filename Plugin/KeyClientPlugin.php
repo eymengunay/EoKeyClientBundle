@@ -88,17 +88,17 @@ class KeyClientPlugin extends AbstractPlugin
 
         $paymentResponse = $client->parsePaymentResponse();
 
-        if ($paymentResponse->getResult() == 'KO') {
-            $ex = new FinancialException('Key Client error: '.$paymentResponse->getMessage());
+        if ($paymentResponse->get('esito') == 'KO') {
+            $ex = new FinancialException('Key Client error: '.$paymentResponse->get('messaggio'));
             $ex->setFinancialTransaction($transaction);
             $transaction->setResponseCode('Failed');
-            $transaction->setReasonCode($paymentResponse->getResult());
+            $transaction->setReasonCode($paymentResponse->get('esito'));
 
             throw $ex;
         }
 
-        $transaction->setReferenceNumber($paymentResponse->getSignature());
-        $transaction->setProcessedAmount($paymentResponse->getAmount());
+        $transaction->setReferenceNumber($paymentResponse->get('mac'));
+        $transaction->setProcessedAmount($paymentResponse->get('importo'));
         $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
         $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
     }
