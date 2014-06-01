@@ -17,14 +17,18 @@ use JMS\Payment\CoreBundle\Plugin\PluginInterface;
 use JMS\Payment\CoreBundle\Plugin\Exception\FinancialException;
 use JMS\Payment\CoreBundle\Plugin\Exception\Action\VisitUrl;
 use JMS\Payment\CoreBundle\Plugin\Exception\ActionRequiredException;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class KeyClientPlugin extends AbstractPlugin
 {
     /**
-     * @var ContainerInterface
+     * @var string
      */
-    protected $container;
+    protected $alias;
+
+    /**
+     * @var string
+     */
+    protected $secret;
 
     /**
      * @var string
@@ -39,11 +43,13 @@ class KeyClientPlugin extends AbstractPlugin
     /**
      * Class constructor
      *
-     * @param ContainerInterface $container
+     * @param string $alias
+     * @param string $string
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct($alias, $secret)
     {
-        $this->container = $container;
+        $this->alias  = $alias;
+        $this->secret = $secret;
     }
 
     /**
@@ -60,10 +66,8 @@ class KeyClientPlugin extends AbstractPlugin
     public function approveAndDeposit(FinancialTransactionInterface $transaction, $retry)
     {
         $data   = $transaction->getExtendedData();
-        $alias  = $this->container->getParameter('eo_keyclient.alias');
-        $secret = $this->container->getParameter('eo_keyclient.secret');
 
-        $client = new Client($alias, $secret);
+        $client = new Client($this->alias, $this->secret);
         $paymentRequest = new PaymentRequest(
             intval($transaction->getRequestedAmount() * 100),  // Amount
             'EUR',                                             // Currency

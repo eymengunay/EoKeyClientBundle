@@ -7,7 +7,8 @@
     <services>
         <!-- Payment plugin -->
         <service id="eo_keyclient.payment_plugin" class="Eo\KeyClientBundle\Plugin\KeyClientPlugin">
-            <argument type="service" id="service_container"/>
+            <argument>%eo_keyclient.alias%</argument>
+            <argument>%eo_keyclient.secret%</argument>
             <tag name="payment.plugin" />
         </service>
         <!-- Payment method form type -->
