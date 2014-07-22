@@ -63,6 +63,32 @@ class KeyClientPlugin extends AbstractPlugin
     /**
      * {@inheritdoc}
      */
+    public function approve(FinancialTransactionInterface $transaction, $retry)
+    {
+        return $this->approveAndDeposit($transaction, $retry);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deposit(FinancialTransactionInterface $transaction, $retry)
+    {
+        $data = $transaction->getExtendedData();
+        if ($data->has('esito') === false) {
+            throw new \RuntimeException('You must first approve this payment');
+        }
+
+        $data->set('deposit', true);
+
+        $transaction->setReferenceNumber($data->get('esito'));
+        $transaction->setProcessedAmount($transaction->getProcessedAmount());
+        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
+        $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function approveAndDeposit(FinancialTransactionInterface $transaction, $retry)
     {
         $data   = $transaction->getExtendedData();
