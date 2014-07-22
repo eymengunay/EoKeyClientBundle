@@ -13,7 +13,7 @@ Add EoKeyClientBundle in your composer.json:
 ```
 {
     "require": {
-        "eo/keyclient-bundle": "dev-master"
+        "eo/keyclient-bundle": "@stable"
     }
 }
 ```
