@@ -79,8 +79,8 @@ class KeyClientPlugin extends AbstractPlugin
         }
 
         $data->set('deposit', true);
-
-        $transaction->setReferenceNumber($data->get('esito'));
+        
+        $transaction->setReferenceNumber($this->getTransactionCode($data));
         $transaction->setProcessedAmount($transaction->getProcessedAmount());
         $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
         $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
